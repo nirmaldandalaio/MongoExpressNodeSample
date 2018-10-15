@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 
 //create exoress aoo
 const app = express();
+const path =  require('path');
 
 //parse requests of content-type -  application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,12 +28,15 @@ mongoose.connect(dbConfig.url, {
 })
 
 //define a simple route
-app.get('/', (requestAnimationFrame, res) => {
-    res.json({"message" : "Welcome to SampleApp!"});
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname + '/index.html'));
 });
+
+app.use('/scripts', express.static(__dirname + '/scripts'));
 
 //Require Users routes
 const routes = require('./app/routes/user.routes.js')(app);
+const grouproutes = require('./app/routes/group.routes.js')(app);
 
 //listen for the port
 app.listen(3000, () => {
