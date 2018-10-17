@@ -73,7 +73,7 @@ exports.delete = (req, res) => {
 exports.createprofile = (req, res) => {
     // Create a user
     const userprofile = new UserProfile({
-        id: req.body.id,
+        id: req.body.userid,
         friendList: [
             {
                 id: req.body.friendList[0].id,
@@ -114,4 +114,20 @@ exports.findAllProfiles = (req, res) => {
                 message: err.message || "Error"
             });
         });
+};
+
+exports.updateOneProfile = (req, res) => {
+    UserProfile.findOneAndUpdate({id: req.body.userid}, {$push: {groupList: req.body.groupid}})
+        .then(userprofile => {
+            if(!userprofile) {
+                return res.status(404).send({
+                    message: "Userprofile not found with id " + req.params.userId
+                })
+            }
+            res.send(userprofile);
+        }).catch(err => {
+            return res.status(500).send({
+                message: "Error retrieving the user with id " + req.params.userId
+            })
+    });
 };

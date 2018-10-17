@@ -19,4 +19,7 @@ module.exports = (app) => {
 
     //Get all profiles
     app.get('/profile', users.findAllProfiles);
+
+    //Update groupid in userprofile
+    app.post('/updateProfile', users.updateOneProfile);
 }

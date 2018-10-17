@@ -5,4 +5,5 @@ const GroupSchema = mongoose.Schema({
     members: Array
 });
 
+
 module.exports = mongoose.model('Group', GroupSchema);
