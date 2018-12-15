@@ -1,15 +1,14 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+/****************/
 
-//create exoress aoo
-const app = express();
-const path =  require('path');
+// Require the framework and instantiate it
+const fastify = require('fastify')({
+    logger: true
+})
 
-//parse requests of content-type -  application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
-//parse requests of content-type - application/json
-app.use(bodyParser.json());
+// Import Swagger Options
+const swagger = require('./config/swagger')
+// Register Swagger
+fastify.register(require('fastify-swagger'), swagger.options)
 
 //Configuring the database
 const dbConfig = require('./config/database.config.js');
@@ -26,19 +25,30 @@ mongoose.connect(dbConfig.url, {
     console.log("Could not connect to the DB");
     process.exit();
 })
+  
+// Declare a route
+fastify.get('/', async (request, reply) => {
+    return { hello: 'world' }
+})
 
-//define a simple route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/index.html'));
-});
-
-app.use('/scripts', express.static(__dirname + '/scripts'));
+//app.use('/scripts', express.static(__dirname + '/scripts'));
 
 //Require Users routes
-const routes = require('./app/routes/user.routes.js')(app);
-const grouproutes = require('./app/routes/group.routes.js')(app);
+const routes = require('./app/routes/carroutes.js')
 
-//listen for the port
-app.listen(3000, () => {
-    console.log("Server listening on port 3000");
-});
+routes.forEach((route, index) => {
+    fastify.route(route)
+})
+  
+// Run the server!
+const start = async () => {
+try {
+    await fastify.listen(3000)
+    fastify.swagger()
+    fastify.log.info(`server listening on ${fastify.server.address().port}`)
+} catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+}
+}
+start()
